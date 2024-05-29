@@ -8,7 +8,7 @@ const Experiences = () => {
           rel="noopener noreferrer"
           target="_blank"
           href="https://mitohealth.com/"
-          className="text-lg font-bold"
+          className="text-lg font-semibold"
         >
           Mito Health
         </a>
@@ -22,7 +22,7 @@ const Experiences = () => {
           rel="noopener noreferrer"
           target="_blank"
           href="https://www.quqo.com"
-          className="text-lg font-bold"
+          className="text-lg font-semibold"
         >
           Quqo
         </a>
@@ -36,7 +36,7 @@ const Experiences = () => {
           rel="noopener noreferrer"
           target="_blank"
           href="https://seamoney.com/"
-          className="text-lg font-bold"
+          className="text-lg font-semibold"
         >
           Seamoney
         </a>
@@ -50,7 +50,7 @@ const Experiences = () => {
           rel="noopener noreferrer"
           target="_blank"
           href="https://careers.shopee.sg/about"
-          className="text-lg font-bold"
+          className="text-lg font-semibold"
         >
           Shopee
         </a>
@@ -64,7 +64,7 @@ const Experiences = () => {
           rel="noopener noreferrer"
           target="_blank"
           href="https://grain.com.sg/"
-          className="text-lg font-bold"
+          className="text-lg font-semibold"
         >
           Grain
         </a>

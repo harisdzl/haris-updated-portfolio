@@ -3,19 +3,27 @@ import React from "react";
 const Projects = () => {
   return (
     <div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-2 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
-          href="https://mitohealth.com/"
+          href="https://github.com/harisdzl/sprout"
           className="text-lg font-bold"
         >
-          Mito Health
+          Sprout
         </a>
-        <h3>Software Engineer Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          July 2024 - October 2024
-        </span>
+        <h3>Blockchain based job marketplace</h3>
+      </div>
+      <div className="grid grid-cols-2 mb-4">
+        <a
+          rel="noopener noreferrer"
+          target="_blank"
+          href="https://github.com/harisdzl/go-crud-app"
+          className="text-lg font-bold"
+        >
+          Go Crud
+        </a>
+        <h3>Go CRUD Backend </h3>
       </div>
     </div>
   );

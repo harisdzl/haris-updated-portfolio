@@ -1,0 +1,508 @@
+---
+title: "Creating a Multi-strategy Logger Package in Go"
+publishedAt: "2024-04-09"
+summary: "Implement a Multi-strategy Logger in Go"
+---
+
+# Implementing a Multi Channel Logger Repository
+
+In this document, we will explore how I implemented a multi-channel logger repository in Golang. A multi-channel logger repository allows for logging to be directed and categorized into multiple output channels, providing a more organized and efficient logging system. This is particularly useful in complex applications where different types of logs may need to be processed or viewed separately. This will be done in a DDD architecture, following the use of the Domain, and Infrastructure layers. Some example of channels that will be utilized in this project would be Zap and Honeycomb.
+
+## Setting up the Logger Entity
+
+In this package, I will have the the different logger pointers to structure the Logger Entity. For e.g, a \*zap.Logger entity.
+
+```go
+package logger_entity
+
+import (
+	"go.uber.org/zap"
+)
+
+type Logger struct {
+	Zap *zap.Logger
+}
+```
+
+## Setting up the Logger Repository
+
+Next, create the Logger Repository as the general interface for all loggers. This will contain the relevant functions for all logs.
+
+```go
+package logger_repository
+
+type LoggerRepository interface {
+	Debug(msg string, fields map[string]interface{})
+	Info(msg string, fields map[string]interface{})
+	Warn(msg string, fields map[string]interface{})
+	Error(msg string, fields map[string]interface{})
+	Fatal(msg string, fields map[string]interface{})
+}
+
+```
+
+## Setting up a Logger constructor in the Persistence
+
+As we want to initialize the different Loggers e.g Zap, only once and store it in persistence, we need a Logger constructor that will be stored in the Persistence of the application. The code below initializes Zap once. For honeycomb, the initalizing occurs in the Middleware.
+
+```go
+package db
+
+import (
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/logger_entity"
+	"go.uber.org/zap"
+)
+func NewLogger() (*logger_entity.Logger, error) {
+	var logger *logger_entity.Logger
+
+	// Initialize Zap
+	zapLogger, _ := zap.NewProduction()
+	defer zapLogger.Sync()
+
+	logger = &logger_entity.Logger{
+		Zap: zapLogger,
+	}
+
+	// Initialize other logger channels e.g Slack...
+
+	return logger, nil
+}
+
+```
+
+Then, in the base layer, initialize all the different loggers by calling the NewLogger() and store it in Persistence.
+
+```go
+package base
+
+import (
+	"log"
+
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/category_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/customer_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/image_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/inventory_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/logger_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/order_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/ordereditem_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/product_entity"
+	"github.com/harisquqo/quqo-challenge-1/domain/entity/warehouse_entity"
+	"github.com/harisquqo/quqo-challenge-1/infrastructure/persistence/base/db"
+	"github.com/opensearch-project/opensearch-go"
+	"github.com/redis/go-redis/v9"
+	storage_go "github.com/supabase-community/storage-go"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gorm.io/gorm"
+)
+
+// Repositories struct -- Currently only Product Repo
+type Persistence struct {
+	DB *gorm.DB
+	DbRedis *redis.Client
+	DbMongo *mongo.Client
+	DbOpensearch *opensearch.Client
+	DbSupabase *storage_go.Client
+	Logger *logger_entity.Logger
+}
+
+// Function to create a new repository
+func NewPersistence() (*Persistence, error) {
+	database, errDatabase := db.NewDB()
+	redisDb, errRedisDb := db.NewRedisDB()
+	mongoDb, errMongoDb := db.NewMongoDB()
+	opensearchDb, errOpensearchDb := db.NewOpenSearchDB()
+	supabaseDb, errSupabaseDb := db.NewSupabaseDB()
+	logger, errLogger := db.NewLogger()
+
+	if errDatabase != nil {
+		log.Fatal(errDatabase)
+	}
+
+	if errRedisDb != nil {
+		log.Fatal(errRedisDb)
+	}
+
+	if errMongoDb != nil {
+		log.Fatal(errMongoDb)
+	}
+
+	if errOpensearchDb != nil {
+		log.Fatal(errOpensearchDb)
+	}
+
+	if errSupabaseDb != nil {
+		log.Fatal(errSupabaseDb)
+	}
+
+	if errSupabaseDb != nil {
+		log.Fatal(errLogger)
+	}
+
+	return &Persistence{
+		DB: database.DB,
+		DbRedis: redisDb,
+		DbMongo: mongoDb,
+		DbOpensearch: opensearchDb,
+		DbSupabase: supabaseDb,
+		Logger: logger,
+	}, nil
+
+}
+
+//This migrate all tables
+func (s *Persistence) Automigrate() error {
+	return s.DB.AutoMigrate(&product_entity.Product{},
+		&inventory_entity.Inventory{},
+		&inventory_entity.InventoryLog{},
+		&warehouse_entity.Warehouse{},
+		&image_entity.Image{},
+		&category_entity.Category{},
+		&customer_entity.Customer{},
+		&order_entity.Order{},
+		&ordereditem_entity.OrderedItem{})
+}
+```
+
+From there, when running the application, all Loggers will be initialized in Persistence.
+
+## Create the different Logger Implementations
+
+Next, we want to implement the different Logger Repositories, such as creating a NewZapRepository and NewHoneycombRepo for e.g.
+
+```go
+package zap
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/harisquqo/quqo-challenge-1/infrastructure/persistence/base"
+	"go.uber.org/zap"
+)
+
+// ZapRepo is the Zap logger implementation
+type ZapRepo struct {
+	p *base.Persistence
+	c *gin.Context
+}
+
+// NewZapRepository creates a new Zap logger repository
+func NewZapRepository(p *base.Persistence, c *gin.Context) *ZapRepo {
+	return &ZapRepo{p, c}
+}
+
+// Debug logs a debug message
+func (z *ZapRepo) Debug(msg string, fields map[string]interface{}) {
+	z.p.Logger.Zap.Debug(msg, z.convertFields(fields)...)
+}
+
+// Info logs an info message
+func (z *ZapRepo) Info(msg string, fields map[string]interface{}) {
+	z.p.Logger.Zap.Info(msg, z.convertFields(fields)...)
+}
+
+// Warn logs a warning message
+func (z *ZapRepo) Warn(msg string, fields map[string]interface{}) {
+	z.p.Logger.Zap.Warn(msg, z.convertFields(fields)...)
+}
+
+// Error logs an error message
+func (z *ZapRepo) Error(msg string, fields map[string]interface{}) {
+	z.p.Logger.Zap.Error(msg, z.convertFields(fields)...)
+}
+
+// Fatal logs a fatal message
+func (z *ZapRepo) Fatal(msg string, fields map[string]interface{}) {
+	z.p.Logger.Zap.Fatal(msg, z.convertFields(fields)...)
+}
+
+// convertFields converts fields into Zap-compatible fields
+func (z *ZapRepo) convertFields(fields map[string]interface{}) []zap.Field {
+	// Convert fields to Zap fields
+	var zapFields []zap.Field
+	for key, value := range fields {
+		zapFields = append(zapFields, zap.Any(key, value))
+	}
+	return zapFields
+}
+```
+
+```go
+package honeycomb
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"log"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/harisquqo/quqo-challenge-1/infrastructure/persistence/base"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
+)
+
+// HoneycombRepo is the Honeycomb logger implementation
+type HoneycombRepo struct {
+	p *base.Persistence
+	c *gin.Context
+	span trace.Span
+}
+
+func NewHoneycombRepository(p *base.Persistence, c *gin.Context, info string) *HoneycombRepo {
+    // Retrieve otel_context from Gin context if it exists
+    ctxValue, exists := c.Get("otel_context")
+    // Implement info logging with Honeycomb using the retrieved context
+    var ctx context.Context
+    if exists {
+        log.Println("Otel context exists: Getting this from " + info)
+        ctx, _ = ctxValue.(context.Context)
+    } else {
+        log.Println("Getting this from" + info)
+        ctx = c.Request.Context()
+    }
+    tracer := otel.Tracer("")
+    _, span := tracer.Start(ctx, info)
+
+    // Log information about the span
+    log.Println("Trace ID: ", span.SpanContext().TraceID().String())
+    log.Println("Span created: ", span.SpanContext().SpanID().String())
+
+    return &HoneycombRepo{p, c, span}
+}
+
+// Debug logs a debug message
+func (h *HoneycombRepo) Debug(msg string, fields map[string]interface{}) {
+	jsonData, jsonDataErr := json.Marshal(fields)
+
+	if jsonDataErr != nil {
+		return
+	}
+
+	h.span.AddEvent(msg, trace.WithAttributes(
+		attribute.String("level", "Debug"),
+		attribute.String("data", string(jsonData))))
+
+}
+
+// Info logs an info message
+func (h *HoneycombRepo) Info(msg string, fields map[string]interface{}) {
+
+	jsonData, jsonDataErr := json.Marshal(fields)
+
+	if jsonDataErr != nil {
+		return
+	}
+
+	h.span.AddEvent(msg, trace.WithAttributes(
+		attribute.String("level", "Info"),
+		attribute.String("data", string(jsonData))))
+
+}
+
+func (h *HoneycombRepo) Error(msg string, fields map[string]interface{}) {
+    jsonData, jsonDataErr := json.Marshal(fields)
+    if jsonDataErr != nil {
+        return
+    }
+
+    h.span.RecordError(errors.New(msg), trace.WithAttributes(
+		attribute.String("level", "Error"),
+        attribute.String("data", string(jsonData))))
+}
+
+// Warn logs a warning message
+func (h *HoneycombRepo) Warn(msg string, fields map[string]interface{}) {
+    // Implement warn logging with Honeycomb
+    // This function can be implemented similar to the Info function
+
+    jsonData, jsonDataErr := json.Marshal(fields)
+    if jsonDataErr != nil {
+        return
+    }
+
+    h.span.AddEvent(msg, trace.WithAttributes(
+		attribute.String("level", "Warn"),
+        attribute.String("data", string(jsonData))))
+}
+
+// Fatal logs a fatal message
+func (h *HoneycombRepo) Fatal(msg string, fields map[string]interface{}) {
+    // Implement fatal logging with Honeycomb
+    // This function can be implemented similar to the Info function
+
+    jsonData, jsonDataErr := json.Marshal(fields)
+    if jsonDataErr != nil {
+        return
+    }
+
+    h.span.AddEvent(msg, trace.WithAttributes(
+		attribute.String("level", "Fatal"),
+        attribute.String("data", string(jsonData))))
+
+	os.Exit(1)
+}
+
+func (h *HoneycombRepo) GetSpan() trace.Span {
+    return h.span
+}
+
+```
+
+Then, in the base file of the Logger Repository in implementation layer, we want to initialize each repository based on a list of strings of channels that is the input.
+
+```go
+package logger
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/harisquqo/quqo-challenge-1/domain/repository/logger_repository"
+	honeycomb "github.com/harisquqo/quqo-challenge-1/infrastructure/implementations/logger/honeycomb_implementation"
+	zap "github.com/harisquqo/quqo-challenge-1/infrastructure/implementations/logger/zap_implementation"
+	"github.com/harisquqo/quqo-challenge-1/infrastructure/persistence/base"
+	"go.opentelemetry.io/otel/trace"
+)
+
+// LoggerRepo is a logger repository that can use multiple channels
+type LoggerRepo struct {
+	loggers []logger_repository.LoggerRepository
+	c *gin.Context
+	p *base.Persistence
+	span trace.Span
+}
+
+const (
+	Zap = "Zap"
+	Honeycomb = "Honeycomb"
+)
+
+// NewLoggerRepository creates a new logger repository based on the specified channels
+func NewLoggerRepository(channels []string, p *base.Persistence, c *gin.Context, info string) (LoggerRepo, error) {
+	var loggers []logger_repository.LoggerRepository
+	var honeycombRepo *honeycomb.HoneycombRepo
+	for _, channel := range channels {
+		switch channel {
+		case Zap:
+			loggers = append(loggers, zap.NewZapRepository(p, c))
+		case Honeycomb:
+			honeycombRepo = honeycomb.NewHoneycombRepository(p, c, info)
+			loggers = append(loggers, honeycombRepo)
+		default:
+			// You might want to log or handle unsupported channels
+			continue
+		}
+	}
+
+	var span trace.Span
+	if honeycombRepo != nil {
+		span = honeycombRepo.GetSpan()
+	}
+
+	// if len(loggers) == 0 {
+	// 	return nil, errors.New("no supported logger type found in the provided channels")
+	// }
+
+	return LoggerRepo{loggers: loggers, c: c, span: span}, nil
+}
+
+// Debug logs a debug message
+func (l *LoggerRepo) Debug(msg string, fields map[string]interface{}) {
+	for _, logger := range l.loggers {
+		logger.Debug(msg, fields)
+	}
+}
+
+// Info logs an info message
+func (l *LoggerRepo) Info(msg string, fields map[string]interface{}) {
+	for _, logger := range l.loggers {
+		logger.Info(msg, fields)
+	}
+}
+
+// Warn logs a warning message
+func (l *LoggerRepo) Warn(msg string, fields map[string]interface{}) {
+	for _, logger := range l.loggers {
+		logger.Warn(msg, fields)
+	}
+}
+
+// Error logs an error message
+func (l *LoggerRepo) Error(msg string, fields map[string]interface{}) {
+	for _, logger := range l.loggers {
+		logger.Error(msg, fields)
+	}
+}
+
+// Fatal logs a fatal message
+func (l *LoggerRepo) Fatal(msg string, fields map[string]interface{}) {
+	for _, logger := range l.loggers {
+		logger.Fatal(msg, fields)
+	}
+}
+
+// End function
+
+func (l *LoggerRepo) End() {
+	l.span.End()
+}
+
+// SetContextWithSpan sets the context in the Gin context with the provided span
+func (l *LoggerRepo) SetContextWithSpan() {
+    // if l.span == nil {
+    //     return // If span is nil, do nothing
+    // }
+    l.c.Set("otel_context", trace.ContextWithSpan(l.c.Request.Context(), l.span))
+}
+```
+
+This will then call each function following the LoggerRepository interface. By doing so, we can choose the channels that we want to log to for different functions.
+
+## Example usage of Logger Repository
+
+This is an example of the usage of a Logger Repository. First we create a list of channels that we want to log to. Then we initialize the Logger Repository by calling logger.NewLoggerRepository(channels, persistence, gin context, information). This returns the initialized repository and an error if there is one. From this, we call different logger functions such as loggerRepo.Error(…) or loggerRepo.Info(…) and pass in the respective useful functions.
+
+```go
+func (o *OrderedItemsRepo) SaveOrderedItem(tx *gorm.DB, orderedItem *ordereditem_entity.OrderedItem) (*ordereditem_entity.OrderedItem, error) {
+	channels := []string{"Zap", "Honeycomb"}
+	loggerRepo, loggerErr := logger.NewLoggerRepository(channels, o.p, o.c, "implementations/SaveOrderedItem")
+	defer loggerRepo.End()
+
+	if loggerErr != nil {
+		return nil, loggerErr
+	}
+
+	if tx == nil {
+		var errTx error
+		tx := o.p.DB.Begin()
+		if tx.Error != nil {
+			return nil, errors.New("failed to start transaction")
+		}
+
+		// Defer rollback in case of panic
+		defer func() {
+			if r := recover(); r != nil {
+				tx.Rollback()
+			} else if errTx != nil {
+				tx.Rollback()
+			} else {
+				errC := tx.Commit().Error
+				if errC != nil {
+					tx.Rollback()
+				}
+			}
+		}()
+	}
+
+	err := tx.Debug().Create(&orderedItem).Error
+	if err != nil {
+		// tracer.Span.RecordError(err)
+		fmt.Println("Failed to create orderedItem")
+		fmt.Println(err)
+		**loggerRepo.Error(err.Error(), map[string]interface{}{})**
+		return nil, err
+	}
+
+	**loggerRepo.Info("Ordered Item Saved", map[string]interface{}{"data": orderedItem})**
+	return orderedItem, nil
+}
+```

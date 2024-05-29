@@ -22,10 +22,7 @@ export default function Page() {
         Experiences
       </h1>
       <Experiences />
-      <h1
-        className="mb-8 mt-8 font text-2xl font-semibold tracking-tighter underline underline-offset-8
-"
-      >
+      <h1 className="mb-8 mt-8 font text-2xl font-semibold tracking-tighter underline underline-offset-8">
         Projects
       </h1>
       <Projects />
