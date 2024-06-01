@@ -3,7 +3,7 @@ import React from "react";
 const Experiences = () => {
   return (
     <div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
@@ -12,12 +12,13 @@ const Experiences = () => {
         >
           Mito Health
         </a>
+
         <h3>Software Engineer Intern</h3>
         <span className="text-neutral-600 dark:text-neutral-400">
           Jul 2024 - Oct 2024
         </span>
       </div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
@@ -31,7 +32,7 @@ const Experiences = () => {
           Jan 2024 - Jun 2024
         </span>
       </div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
@@ -45,7 +46,7 @@ const Experiences = () => {
           Jun 2023 - Aug 2023
         </span>
       </div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
@@ -59,7 +60,7 @@ const Experiences = () => {
           Feb 2023 - Apr 2023
         </span>
       </div>
-      <div className="grid grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
