@@ -9,8 +9,8 @@ import Footer from "./components/footer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Haris",
-    template: "%s | Next.js Portfolio Starter",
+    default: "Henlo",
+    template: "%s | Haris' Website",
   },
   description: "This is my portfolio.",
   openGraph: {
@@ -30,6 +30,9 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
       "max-snippet": -1,
     },
+  },
+  icons: {
+    icon: "/happy-face.png",
   },
 };
 
