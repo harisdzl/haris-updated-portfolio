@@ -1,15 +1,5 @@
 @import "tailwindcss";
 
-html,
-body {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-body {
-  flex-direction: column;
-}
 ::selection {
   background-color: #47a3f3;
   color: #fefefe;
