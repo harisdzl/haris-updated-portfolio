@@ -3,7 +3,7 @@ import React from "react";
 const Experiences = () => {
   return (
     <div>
-      {/* <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
           target="_blank"
@@ -15,9 +15,9 @@ const Experiences = () => {
 
         <h3>Software Engineer Intern</h3>
         <span className="text-neutral-600 dark:text-neutral-400">
-          Jul 2024 - Oct 2024
+          Jul 2024 - Present
         </span>
-      </div> */}
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
         <a
           rel="noopener noreferrer"
