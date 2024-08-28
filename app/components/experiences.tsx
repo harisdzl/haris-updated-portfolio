@@ -69,7 +69,7 @@ const Experiences = () => {
         >
           Grain
         </a>
-        <h3>Software Engineer Intern</h3>
+        <h3>Business Development Intern</h3>
         <span className="text-neutral-600 dark:text-neutral-400">
           Apr 2021 - Jul 2021
         </span>
