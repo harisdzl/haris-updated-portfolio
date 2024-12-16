@@ -15,7 +15,7 @@ const Experiences = () => {
 
         <h3>Software Engineer Intern</h3>
         <span className="text-neutral-600 dark:text-neutral-400">
-          Jul 2024 - Present
+          Jul 2024 - Nov 2024
         </span>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
