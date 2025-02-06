@@ -5,7 +5,7 @@ export default function Page() {
   return (
     <section>
       <h1 className="mb-8 text-2xl font-semibold tracking-tighter underline underline-offset-8">
-        Hi, I'm Haris.
+        Hi, I'm Haris!
       </h1>
       <p className="mb-4">
         {`I'm a technology enthusiast, currently exploring tech startups in Singapore. I'm a Final Year
