@@ -8,9 +8,9 @@ export default function Page() {
         Hi, I'm Haris.
       </h1>
       <p className="mb-4">
-        {`I'm a technology enthusiast, currently exploring tech startups in Singapore. I'm a Final Year
-        Business Analytics Student, looking to learn more about building software to solve interesting problems.
-        Interested in the finance, health and e-commerce space.`}
+        {`I'm a technology enthusiast, currently exploring tech startups in Singapore. I've recently graduated from 
+        Business Analytics at NUS, where I'm looking to learn more about building software to solve interesting problems.
+        Interested in the health, fintecha and the e-commerce space.`}
       </p>
       <h1
         className="mb-8 text-2xl font-semibold tracking-tighter underline underline-offset-8

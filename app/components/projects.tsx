@@ -25,6 +25,17 @@ const Projects = () => {
         </a>
         <h3>Go CRUD Backend </h3>
       </div>
+      <div className="grid grid-cols-2 mb-4">
+        <a
+          rel="noopener noreferrer"
+          target="_blank"
+          href="https://github.com/LanguagePersona"
+          className="text-lg font-bold"
+        >
+          Akerue
+        </a>
+        <h3>Korean Language Learning App</h3>
+      </div>
     </div>
   );
 };
