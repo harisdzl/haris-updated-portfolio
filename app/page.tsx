@@ -9,7 +9,7 @@ export default function Page() {
       </h1>
       <p className="mb-4">
         {`I'm a technology enthusiast, currently exploring tech startups in Singapore. I've recently graduated from 
-        Business Analytics at NUS, where I'm looking to learn more about building software to solve interesting problems.
+        Business Analytics at NUS and now I'm looking to learn more about building software to solve interesting problems.
         Interested in the health, fintecha and the e-commerce space.`}
       </p>
       <h1
