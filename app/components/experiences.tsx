@@ -1,79 +1,66 @@
+"use client";
 import React from "react";
+import { useMagicHover } from "./useMagicHover";
+
+const companies = [
+  {
+    name: "Mito Health",
+    href: "https://mitohealth.com/",
+    role: "Software Engineer Intern",
+    date: "Jul 2024 - Nov 2024",
+  },
+  {
+    name: "Quqo",
+    href: "https://www.quqo.com",
+    role: "Software Engineer Intern",
+    date: "Jan 2024 - Jun 2024",
+  },
+  {
+    name: "Seamoney",
+    href: "https://seamoney.com/",
+    role: "Retail Finance Intern",
+    date: "Jun 2023 - Aug 2023",
+  },
+  {
+    name: "Shopee",
+    href: "https://careers.shopee.sg/about",
+    role: "Operational Excellence Intern",
+    date: "Feb 2023 - Apr 2023",
+  },
+  {
+    name: "Grain",
+    href: "https://grain.com.sg/",
+    role: "Business Development Intern",
+    date: "Apr 2021 - Jul 2021",
+  },
+];
 
 const Experiences = () => {
-  return (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          href="https://mitohealth.com/"
-          className="text-lg font-semibold"
-        >
-          Mito Health
-        </a>
+  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>({ widthFactor: 0.75 });
 
-        <h3>Software Engineer Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          Jul 2024 - Nov 2024
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          href="https://www.quqo.com"
-          className="text-lg font-semibold"
+  return (
+    <div ref={containerRef} className="relative">
+      <div style={bgStyle} />
+      {companies.map((exp, idx) => (
+        <div
+          key={exp.name}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-4 relative z-10 justify-items-center items-center"
         >
-          Quqo
-        </a>
-        <h3>Software Engineer Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          Jan 2024 - Jun 2024
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          href="https://seamoney.com/"
-          className="text-lg font-semibold"
-        >
-          Seamoney
-        </a>
-        <h3>Retail Finance Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          Jun 2023 - Aug 2023
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          href="https://careers.shopee.sg/about"
-          className="text-lg font-semibold"
-        >
-          Shopee
-        </a>
-        <h3>Operational Excellence Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          Feb 2023 - Apr 2023
-        </span>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 mb-4">
-        <a
-          rel="noopener noreferrer"
-          target="_blank"
-          href="https://grain.com.sg/"
-          className="text-lg font-semibold"
-        >
-          Grain
-        </a>
-        <h3>Business Development Intern</h3>
-        <span className="text-neutral-600 dark:text-neutral-400">
-          Apr 2021 - Jul 2021
-        </span>
-      </div>
+          <a
+            rel="noopener noreferrer"
+            target="_blank"
+            href={exp.href}
+            className="text-lg font-semibold relative px-2 py-1 rounded-md transition-colors duration-200 text-center md:text-left w-full"
+            {...getLinkProps(idx)}
+          >
+            {exp.name}
+          </a>
+          <h3 className="text-center md:text-left w-full">{exp.role}</h3>
+          <span className="text-neutral-600 dark:text-neutral-400 text-center md:text-left w-full">
+            {exp.date}
+          </span>
+        </div>
+      ))}
     </div>
   );
 };

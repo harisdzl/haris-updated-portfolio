@@ -1,3 +1,7 @@
+"use client";
+import React from "react";
+import { useMagicHover } from "./useMagicHover";
+
 function ArrowIcon() {
   return (
     <svg
@@ -15,43 +19,45 @@ function ArrowIcon() {
   );
 }
 
+const footerLinks = [
+  {
+    href: "https://github.com/harisdzl",
+    label: "github",
+  },
+  {
+    href: "https://www.linkedin.com/in/haris-dzulkifli/",
+    label: "linkedin",
+  },
+  {
+    href: "mailto:haris@dbasri.com",
+    label: "email",
+  },
+];
+
 export default function Footer() {
+  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLUListElement>();
+
   return (
     <footer className="mb-16">
-      <ul className="font-sm mt-8 flex flex-row space-x-4 text-neutral-600 md:space-x-4 md:space-y-0 dark:text-neutral-300">
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://github.com/harisdzl"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">github</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://www.linkedin.com/in/haris-dzulkifli/"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">linkedin</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="mailto:haris@dbasri.com"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">email</p>
-          </a>
-        </li>
+      <ul
+        ref={containerRef}
+        className="font-sm mt-8 flex flex-row justify-start text-left -ml-4 space-x-4 text-neutral-600 md:space-x-4 md:space-y-0 dark:text-neutral-300 relative"
+      >
+        <div style={bgStyle} />
+        {footerLinks.map((link, idx) => (
+          <li key={link.label}>
+            <a
+              className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100 relative px-2 py-1 rounded-md"
+              rel="noopener noreferrer"
+              target="_blank"
+              href={link.href}
+              {...getLinkProps(idx)}
+            >
+              <ArrowIcon />
+              <p className="ml-2 h-7">{link.label}</p>
+            </a>
+          </li>
+        ))}
       </ul>
     </footer>
   );
