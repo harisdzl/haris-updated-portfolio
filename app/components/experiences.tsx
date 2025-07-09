@@ -36,27 +36,27 @@ const companies = [
 ];
 
 const Experiences = () => {
-  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>({ widthFactor: 0.75 });
+  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>();
 
   return (
     <div ref={containerRef} className="relative">
-      <div style={bgStyle} />
+      <div className="hidden md:block" style={bgStyle} />
       {companies.map((exp, idx) => (
         <div
           key={exp.name}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mb-4 relative z-10 justify-items-center items-center"
+          className="text-sm md:text-base gap-2 grid grid-cols-3 w-full mb-4 relative z-10 text-left"
         >
           <a
             rel="noopener noreferrer"
             target="_blank"
             href={exp.href}
-            className="text-lg font-semibold relative px-2 py-1 rounded-md transition-colors duration-200 text-center md:text-left w-full"
+            className="text-base md:text-lg font-semibold relative px-2 py-1 rounded-md transition-colors duration-200 text-left w-full"
             {...getLinkProps(idx)}
           >
             {exp.name}
           </a>
-          <h3 className="text-center md:text-left w-full">{exp.role}</h3>
-          <span className="text-neutral-600 dark:text-neutral-400 text-center md:text-left w-full">
+          <h3 className="text-left w-full">{exp.role}</h3>
+          <span className="text-neutral-600 dark:text-neutral-400 text-left w-full">
             {exp.date}
           </span>
         </div>

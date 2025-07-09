@@ -21,26 +21,27 @@ const projects = [
 ];
 
 const Projects = () => {
-  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>({ widthFactor: 0.5 });
+  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>();
 
   return (
     <div ref={containerRef} className="relative">
-      <div style={bgStyle} />
+      <div className="hidden md:block" style={bgStyle} />
       {projects.map((proj, idx) => (
         <div
           key={proj.name}
-          className="grid grid-cols-1 md:grid-cols-3 w-full mb-4 relative z-10 justify-items-center items-center"
+          className="text-sm md:text-base gap-2 grid grid-cols-3 w-full mb-4 relative z-10 text-left"
         >
           <a
             rel="noopener noreferrer"
             target="_blank"
             href={proj.href}
-            className="text-lg font-bold relative px-2 py-1 rounded-md transition-colors duration-200 text-center md:text-left w-full"
+            className="text-base md:text-lg font-bold relative px-2 py-1 rounded-md transition-colors duration-200 text-left w-full"
             {...getLinkProps(idx)}
           >
             {proj.name}
           </a>
-          <h3 className="text-center md:text-left w-full">{proj.desc}</h3>
+          <h3 className="text-left w-full">{proj.desc}</h3>
+          <span className="w-full" />
         </div>
       ))}
     </div>
