@@ -21,7 +21,9 @@ const projects = [
 ];
 
 const Projects = () => {
-  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>();
+  const { containerRef, bgStyle, getLinkProps } = useMagicHover<HTMLDivElement>(
+    { widthFactor: 0.75 }
+  );
 
   return (
     <div ref={containerRef} className="relative">
